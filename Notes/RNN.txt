@@ -1,0 +1,23 @@
+RNN (Recurrent Neural Networks):
+    Recurrent Neural Networks (RNNs) are a class of neural networks designed to process sequential data by retaining information from previous steps. They are especially effective for task where context and order matter.
+
+    Designed for sequential and temporal data.
+    Maintains memory of past inputs
+    Widely used in NLP, forecasting and speech tasks
+
+    Task:
+        Translation
+        Text Summarization
+        Image Captioning
+        Conversational Agents
+        Language Modelling
+        Sentiment Analysis
+        Language Generation
+
+There are two Components of RNN:
+    1. Recurrent Neurons
+        The fundamental processing unit is a Recurrent Unit. They hold a hidden state that maintains information about previous input in a sequence. Recurrent units can "remember" information from prior steps by feeding back their hidden state, allowing them to capture dependencies across time.
+    
+    
+
+

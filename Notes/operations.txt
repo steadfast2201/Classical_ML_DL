@@ -1,0 +1,836 @@
+================================================================================
+                    THE ULTIMATE ML CHEAT SHEET: 250 OPERATIONS
+================================================================================
+Libraries covered: Pandas, NumPy, Scikit-Learn, Matplotlib, Seaborn
+Each section contains 50 curated core operations with practical code examples.
+--------------------------------------------------------------------------------
+
+================================================================================
+                                PART 1: PANDAS
+================================================================================
+
+
+--- I. Data Loading & Ingestion ---
+1. pd.read_csv(): Loads data from a CSV file[cite: 4, 58].
+   df = pd.read_csv("data.csv", na_values=["?", "NA"])
+
+2. pd.read_excel(): Loads data from an Excel workbook[cite: 5, 59].
+   df = pd.read_excel("data.xlsx", sheet_name="Sheet1")
+
+3. pd.read_parquet(): Loads highly compressed columnar data[cite: 6, 59].
+   df = pd.read_parquet("data.parquet")
+
+4. pd.read_sql(): Queries database tables directly[cite: 7, 60].
+   df = pd.read_sql("SELECT * FROM table", engine)
+
+5. pd.DataFrame.to_csv(): Exports a DataFrame to a CSV file[cite: 8, 61].
+   df.to_csv("output.csv", index=False)
+
+--- II. Structural Inspection ---
+6. .shape: Returns matrix dimensions as (rows, columns)[cite: 10, 63].
+   rows, cols = df.shape
+
+7. .info(): Summarizes dtypes, non-null counts, and memory size[cite: 11, 64].
+   df.info()
+
+8. .head(): Returns first n rows[cite: 12, 65].
+   df.head(5)
+
+9. .tail(): Returns last n rows[cite: 12, 65].
+   df.tail(5)
+
+10. .dtypes: Returns data types of all columns[cite: 14, 67].
+    print(df.dtypes)
+
+11. .select_dtypes(): Filters columns by data types[cite: 15, 68].
+    num_df = df.select_dtypes(include=['number'])
+
+--- III. Exploratory Data Analysis (EDA) ---
+12. .describe(): Computes summary statistics[cite: 17, 69].
+    stats = df.describe()
+
+13. .value_counts(): Returns category frequency distributions[cite: 18, 70].
+    counts = df['target'].value_counts(normalize=True)
+
+14. .nunique(): Counts distinct items per column[cite: 19, 71].
+    cardinality = df.nunique()
+
+15. .unique(): Returns specific unique elements[cite: 19, 72].
+    arr = df['category'].unique()
+
+16. .corr(): Computes feature correlation metrics[cite: 20, 73].
+    matrix = df.corr(method='pearson')
+
+17. .cov(): Computes unscaled covariance values[cite: 21, 74].
+    matrix = df.cov()
+
+18. .sample(): Takes a random sample slice[cite: 21, 74].
+    sample_df = df.sample(frac=0.1, random_state=42)
+
+--- IV. Data Cleaning & Imputation ---
+19. .isnull() / .isna(): Flags empty tracking locations[cite: 24, 77].
+    mask = df.isnull()
+
+20. .sum(): Sums boolean flags (often used to count nulls)[cite: 25, 78].
+    null_counts = df.isnull().sum()
+
+21. .dropna(): Excludes entries with missing cells[cite: 26, 79].
+    df_clean = df.dropna(subset=['critical_column'])
+
+22. .fillna(): Replaces empty items with a static proxy[cite: 27, 80].
+    df['age'] = df['age'].fillna(df['age'].median())
+
+23. .duplicated(): Flags recurring matching inputs[cite: 28, 81].
+    dupes = df.duplicated()
+
+24. .drop_duplicates(): Removes redundant structural records[cite: 28, 81].
+    df = df.drop_duplicates(keep='first')
+
+25. .replace(): Maps precise token updates[cite: 29, 82].
+    df['col'] = df['col'].replace("?", np.nan)
+
+--- V. Selection & Subsetting ---
+26. .loc[]: Accesses elements via row/column string labels[cite: 31, 84].
+    subset = df.loc[0:100, ['Age', 'Fare']]
+
+27. .iloc[]: Accesses elements via row/column integer positions[cite: 32, 85].
+    X, y = df.iloc[:, :-1], df.iloc[:, -1]
+
+28. .drop(): Discards specified columns or rows[cite: 33, 86].
+    X = df.drop(columns=['id_string', 'name'])
+
+29. .query(): Evaluation tool using filter strings[cite: 34, 87].
+    subset = df.query("age > 21 and fare < 50")
+
+30. .where(): Conditionally updates non-matching items[cite: 35, 88].
+    df['capped'] = df['val'].where(df['val'] < 100, 100)
+
+31. .isin(): Matches items against an exclusion array list[cite: 36, 89].
+    df_filtered = df[df['country'].isin(['US', 'UK'])]
+
+--- VI. Feature Engineering ---
+32. pd.get_dummies(): One-hot encodes category elements[cite: 38, 91].
+    df_encoded = pd.get_dummies(df, drop_first=True)
+
+33. .apply(): Applies a row/column manipulation function[cite: 39, 92].
+    df['len'] = df['text'].apply(lambda x: len(str(x)))
+
+34. .map(): Translates values using a mapping dictionary[cite: 40, 93].
+    df['label'] = df['size'].map({'S': 0, 'M': 1, 'L': 2})
+
+35. .astype(): Casts memory storage types explicitly[cite: 41, 94].
+    df['int_col'] = df['float_col'].astype('int32')
+
+36. .clip(): Limits bounds to cut off outliers[cite: 42, 95].
+    df['clipped'] = df['raw'].clip(lower=0, upper=100)
+
+37. pd.cut(): Splits continuous ranges into even value buckets[cite: 43, 96].
+    df['bin'] = pd.cut(df['age'], bins=[0, 18, 60, 100])
+
+38. pd.qcut(): Splits continuous ranges into even frequency quantiles[cite: 43, 96].
+    df['quantile'] = pd.qcut(df['income'], q=4)
+
+39. .rename(): Updates column text headers[cite: 44, 97].
+    df = df.rename(columns={'Old Name': 'new_name'})
+
+--- VII. Advanced Aggregation & Time Series ---
+40. .groupby(): Groups data by categorical values[cite: 46, 99].
+    grouped = df.groupby('category')
+
+41. .agg(): Computes complex structural summaries simultaneously[cite: 47, 100].
+    summary = df.groupby('cat').agg({'price': ['mean', 'std']})
+
+42. .pivot_table(): Generates standard spreadsheet matrices[cite: 48, 100].
+    table = df.pivot_table(index='user', columns='item', values='rating')
+
+43. pd.to_datetime(): Casts text fields into true datetime objects[cite: 48, 101].
+    df['date'] = pd.to_datetime(df['date_string'])
+
+44. .shift(): Shifts observations by row time steps[cite: 49, 101].
+    df['lag_1'] = df['target'].shift(1)
+
+45. .rolling(): Creates a moving window frame.
+    df['rolling_mean'] = df['target'].rolling(window=7).mean()
+
+--- VIII. Combining & Merging ---
+46. pd.concat(): Chains datasets along a given structural axis.
+    combined = pd.concat([df1, df2], axis=0)
+
+47. pd.merge(): Joins relational tables using key matches.
+    merged = pd.merge(df1, df2, on='user_id', how='left')
+
+48. .join(): Combines dataframes directly on their index.
+    joined = df1.join(df2, lsuffix='_l', rsuffix='_r')
+
+49. .reset_index(): Flattens hierarchical indexes back to columns.
+    df_flat = df.reset_index(drop=True)
+
+50. .set_index(): Converts a column into the dataframe index.
+    df_indexed = df.set_index('timestamp')
+
+
+================================================================================
+                                PART 2: NUMPY
+================================================================================
+
+
+--- I. Array Creation ---
+1. np.array(): Converts Python structural collections to ndarrays.
+   arr = np.array([1, 2, 3])
+
+2. np.zeros(): Generates an array of zeros.
+   zeros = np.zeros((3, 3))
+
+3. np.ones(): Generates an array of ones.
+   ones = np.ones((100, 1))
+
+4. np.arange(): Generates a sequence over a specific interval.
+   seq = np.arrange(start=0, stop=10, step=0.5)
+
+5. np.linspace(): Generates evenly spaced intervals.
+   grid = np.linespace(0, 1, 50)
+
+6. np.eye(): Creates a square identity matrix.
+   identity = np.eye(5)
+
+--- II. Structural Operations ---
+7. ndarray.shape: Returns matrix shape layout.
+   dims = arr.shape
+
+8. ndarray.reshape(): Changes dimensions without altering data values.
+   matrix = arr.reshape(-1, 1)
+
+9. ndarray.ravel(): Flattens multi-dimensional structures.
+   flat = matrix.ravel()
+
+10. np.transpose() / .T: Flips standard indexing axes.
+    transposed = matrix.T
+
+11. np.concatenate(): Binds sequential arrays along an axis.
+    merged = np.concatenate([arr1, arr2], axis=0)
+
+12. np.vstack(): Stacks arrays vertically (row-wise).
+    stacked = np.vstack([arr1, arr2])
+
+13. np.hstack(): Stacks arrays horizontally (column-wise).
+    stacked = np.hstack([arr1, arr2])
+
+14. np.expand_dims(): Adds a new axis dimension placeholder.
+    expanded = np.expand_dims(arr, axis=0)
+
+15. np.squeeze(): Removes single-dimensional tracking axes.
+    squeezed = np.squeeze(expanded)
+
+--- III. Math Operations ---
+16. np.sum(): Computes the sum of elements along a specified axis.
+    total = np.sum(arr, axis=0)
+
+17. np.mean(): Computes the arithmetic mean value.
+    avg = np.mean(arr)
+
+18. np.std(): Computes the statistical standard deviation.
+    deviation = np.std(arr)
+
+19. np.var(): Computes structural data variance metrics.
+    variance = np.var(arr)
+
+20. np.min() / np.max(): Finds structural value extremes.
+    lo, hi = np.min(arr), np.max(arr)
+
+21. np.argmin() / np.argmax(): Returns indices of structural extremes.
+    best_idx = np.argmax(predictions)
+
+22. np.dot() / @: Computes dot product matrix math.
+    result = matrix_A @ matrix_B
+
+23. np.exp(): Computes element-wise exponential transformations.
+    e_x = np.exp(arr)
+
+24. np.log() / np.log1p(): Computes natural log scaling (log1p handles log(1+x)).
+    log_scaled = np.log1p(arr)
+
+25. np.abs(): Returns absolute structural values.
+    positive = np.abs(arr)
+
+26. np.sqrt(): Computes element-wise square roots.
+    root = np.sqrt(arr)
+
+--- IV. Logic & Search ---
+27. np.where(): Conditional execution logic.
+    labels = np.where(predictions > 0.5, 1, 0)
+
+28. np.any(): Checks if any value matches a condition.
+    has_nan = np.any(np.isnan(arr))
+
+29. np.all(): Checks if all values match a condition.
+    all_positive = np.all(arr > 0)
+
+30. np.isnan(): Returns a boolean mask identifying NaN items.
+    nan_mask = np.isnan(arr)
+
+31. np.isinf(): Identifies infinite calculation errors.
+    inf_mask = np.isinf(arr)
+
+32. np.clip(): Caps element values between minimum and maximum limits.
+    bounded = np.clip(arr, a_min=0, a_max=1)
+
+33. np.percentile(): Computes percentile distribution boundaries.
+    p_99 = np.percentile(arr, q=99)
+
+34. np.unique(): Extracts unique sorted data values.
+    items, counts = np.unique(arr, return_counts=True)
+
+35. np.argsort(): Returns the indices that would sort an array.
+    sorted_indices = np.argsort(importance_scores)
+
+--- V. Random Operations ---
+36. np.random.seed(): Fixes generation numbers for reproducibility.
+    np.random.seed(42)
+
+37. np.random.rand(): Generates uniform distribution random floats between (0, 1).
+    noise = np.random.rand(10, 1)
+
+38. np.random.randn(): Generates normal distribution random floats (Gaussian).
+    weights = np.random.randn(5, 5)
+
+39. np.random.randint(): Generates random integer numbers.
+    integers = np.random.randint(low=0, high=10, size=100)
+
+40. np.random.choice(): Picks items randomly from an array pool.
+    sample = np.random.choice(arr, size=5, replace=False)
+
+41. np.random.shuffle(): In-place sequence scrambling.
+    np.random.shuffle(arr)
+
+42. np.random.permutation(): Scrambles sequences while preserving the source array.
+    shuffled_idx = np.random.permutation(len(arr))
+
+--- VI. Advanced Mechanics ---
+43. ndarray.astype(): Changes the memory type representation.
+    float32_arr = arr.astype(np.float32)
+
+44. np.copy(): Clones structures securely to avoid pointer inheritance errors.
+    safe_copy = np.copy(arr)
+
+45. np.tile(): Repeats an entire array pattern dynamic structure layout.
+    tiled = np.tile(arr, reps=(2, 1))
+
+46. np.repeat(): Repeats elements within array structures.
+    repeated = np.repeat(arr, repeats=3)
+
+47. np.diff(): Computes first discrete derivative steps.
+    trends = np.diff(time_series)
+
+48. np.cumsum(): Computes running cumulative additions.
+    growth = np.cumsum(arr)
+
+49. np.maximum(): Computes element-wise maximums between two arrays.
+    relu_out = np.maximum(0, layer_inputs)
+
+50. np.linalg.norm(): Computes matrix structural norm metrics (e.g., L2 norm).
+    distance = np.linalg.norm(vector_A - vector_B)
+
+
+================================================================================
+                               PART 3: SCIKIT-LEARN
+================================================================================
+
+
+--- I. Preprocessing & Scaling ---
+1. StandardScaler(): Rescales features to 0 mean and 1 variance.
+   scaler = StandardScaler().fit(X_train)
+
+2. MinMaxScaler(): Squashes metrics between a specified range (typically [0, 1]).
+   scaler = MinMaxScaler().fit(X_train)
+
+3. RobustScaler(): Robust scaling using median and quartile metrics.
+   scaler = RobustScaler().fit(X_train)
+
+4. OneHotEncoder(): Encodes nominal categories into binary arrays.
+   ohe = OneHotEncoder(sparse_output=False, drop='first').fit(X_train)
+
+5. LabelEncoder(): Normalizes class target labels to integer codes.
+   le = LabelEncoder().fit(y_train)
+
+6. OrdinalEncoder(): Encodes categorical features as ordered integers.
+   oe = OrdinalEncoder().fit(X_train)
+
+7. PolynomialFeatures(): Computes non-linear interacting column combinations.
+   poly = PolynomialFeatures(degree=2).fit_transform(X)
+
+8. Binarizer(): Maps numeric features to binary flags based on a threshold.
+   binarized = Binarizer(threshold=0.0).fit_transform(X)
+
+--- II. Imputation ---
+9. SimpleImputer(): Fills missing fields using central tendency metrics.
+   imp = SimpleImputer(strategy='median').fit(X_train)
+
+10. KNNImputer(): Fills missing fields using nearest neighbor matching.
+    imp = KNNImputer(n_neighbors=5).fit_transform(X)
+
+--- III. Splitting & Validation ---
+11. train_test_split(): Partitions rows randomly into train/test subsets.
+    X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2, random_state=42)
+
+12. KFold(): Implements cross-validation splits.
+    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+
+13. StratifiedKFold(): Preserves class balance ratios across cross-validation splits.
+    skf = StratifiedKFold(n_splits=5)
+
+14. cross_val_score(): Evaluates metric performance across all splits.
+    scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+
+15. cross_validate(): Returns comprehensive diagnostic data from cross-validation.
+    metrics = cross_validate(model, X, y, cv=5, return_train_score=True)
+
+--- IV. Model Tuning ---
+16. GridSearchCV(): Grid searches a fixed hyperparameter matrix.
+    grid = GridSearchCV(estimator=model, param_grid=params, cv=3).fit(X, y)
+
+17. RandomizedSearchCV(): Randomly samples from a hyperparameter space.
+    rand = RandomizedSearchCV(estimator=model, param_distributions=space, cv=3).fit(X, y)
+
+--- V. Linear Models ---
+18. LinearRegression(): Standard Ordinary Least Squares linear regression.
+    reg = LinearRegression().fit(X_train, y_train)
+
+19. LogisticRegression(): Log-linear classification framework.
+    clf = LogisticRegression(max_iter=1000).fit(X_train, y_train)
+
+20. Ridge(): Linear regression with L2 weight regularization.
+    reg = Ridge(alpha=1.0).fit(X_train, y_train)
+
+21. Lasso(): Linear regression with L1 absolute weights (performs feature selection).
+    reg = Lasso(alpha=0.1).fit(X_train, y_train)
+
+22. ElasticNet(): Hybrid regularization combination (L1 + L2 regularization).
+    reg = ElasticNet(l1_ratio=0.5).fit(X_train, y_train)
+
+--- VI. Tree & Ensemble Models ---
+23. DecisionTreeClassifier() / DecisionTreeRegressor(): Core single tree partitions.
+    tree = DecisionTreeClassifier(max_depth=5).fit(X_train, y_train)
+
+24. RandomForestClassifier() / RandomForestRegressor(): Bagged parallel trees.
+    rf = RandomForestClassifier(n_estimators=100).fit(X_train, y_train)
+
+25. GradientBoostingClassifier() / GradientBoostingRegressor(): Sequential boosting trees.
+    gb = GradientBoostingClassifier().fit(X_train, y_train)
+
+26. AdaBoostClassifier(): Adaptive weighting boosting model.
+    ada = AdaBoostClassifier().fit(X_train, y_train)
+
+27. ExtraTreesClassifier(): Extremely randomized ensemble decision tree model.
+    et = ExtraTreesClassifier().fit(X_train, y_train)
+
+28. VotingClassifier() / VotingRegressor(): Ensembles diverse estimators via voting.
+    ensemble = VotingClassifier(estimators=[('rf', rf), ('lr', lr)], voting='soft')
+
+29. StackingClassifier(): Uses a meta-estimator to combine multiple model predictions.
+    stack = StackingClassifier(estimators=[('rf', rf), ('gb', gb)], final_estimator=lr)
+
+--- VII. Distance & Support Vector Models ---
+30. KNeighborsClassifier() / KNeighborsRegressor(): Nearest neighbor lookup models.
+    knn = KNeighborsClassifier(n_neighbors=5).fit(X_train, y_train)
+
+31. SVC() / SVR(): Support Vector Machine optimization boundaries.
+    svm = SVC(kernel='rbf', probability=True).fit(X_train, y_train)
+
+--- VIII. Clustering & Dim Reduction ---
+32. KMeans(): Partitions data into K distinct clusters.
+    clusterer = KMeans(n_clusters=3, random_state=42).fit(X)
+
+33. PCA(): Projects data along principal component variance vectors.
+    pca = PCA(n_components=2).fit(X_train)
+
+--- IX. Evaluation Metrics ---
+34. accuracy_score(): Computes simple classification matching percentages.
+    acc = accuracy_score(y_true, y_pred)
+
+35. precision_score() / recall_score() / f1_score(): Evaluates true positive classifications.
+    f1 = f1_score(y_true, y_pred, average='macro')
+
+36. roc_auc_score(): Evaluates area under the receiver operating characteristic curve.
+    auc = roc_auc_score(y_true, proba_predictions)
+
+37. confusion_matrix(): Computes a classification error layout matrix.
+    cm = confusion_matrix(y_true, y_pred)
+
+38. classification_report(): Returns a summary text block of core model metrics.
+    print(classification_report(y_true, y_pred))
+
+39. mean_squared_error(): Computes mean squared error (MSE) for regression.
+    mse = mean_squared_error(y_true, y_pred, squared=True)
+
+40. mean_absolute_error(): Computes mean absolute error (MAE) for regression.
+    mae = mean_absolute_error(y_true, y_pred)
+
+41. r2_score(): Computes the coefficient of determination ($R^2$).
+    r2 = r2_score(y_true, y_pred)
+
+42. silhouette_score(): Evaluates the separation and density of unsupervised clusters.
+    score = silhouette_score(X, cluster_labels)
+
+--- X. Pipeline & Text Utilities ---
+43. Pipeline(): Chains transformers and estimators together sequentially.
+    pipe = Pipeline([('scaler', StandardScaler()), ('lr', LogisticRegression())])
+
+44. make_pipeline(): Shorthand pipeline construction helper.
+    pipe = make_pipeline(StandardScaler(), LogisticRegression())
+
+45. ColumnTransformer(): Applies specific transformations to targeted columns.
+    ct = ColumnTransformer([('num', StandardScaler(), num_cols), ('cat', OneHotEncoder(), cat_cols)])
+
+46. CountVectorizer(): Converts raw text into a bag-of-words token matrix.
+    vec = CountVectorizer().fit_transform(corpus)
+
+47. TfidfVectorizer(): Computes term frequency-inverse document frequency weights for text.
+    vec = TfidfVectorizer().fit_transform(corpus)
+
+--- XI. Model Selection & Persistence ---
+48. SelectKBest(): Selects the top $K$ features based on a statistical test score.
+    selector = SelectKBest(score_func=f_classif, k=10).fit(X, y)
+
+49. dump() (from joblib): Serializes trained models to disk.
+    import joblib
+    joblib.dump(model, 'model.pkl')
+
+50. load() (from joblib): Deserializes trained models from disk.
+    loaded_model = joblib.load('model.pkl')
+
+
+================================================================================
+                               PART 4: MATPLOTLIB
+================================================================================
+
+
+--- I. Basic Structuring ---
+1. plt.figure(): Initializes window dimensions and resolutions.
+   plt.figure(figsize=(10, 6), dpi=100)
+
+2. plt.subplot(): Grid-based sub-window generator.
+   plt.subplot(2, 1, 1)
+
+3. plt.subplots(): Generates multi-panel figure axes arrays simultaneously.
+   fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(12, 12))
+
+4. plt.show(): Renders structural plot graphics explicitly to screen.
+   plt.show()
+
+5. plt.savefig(): Exports drawing captures to files.
+   plt.savefig("plot.png", bbox_inches='tight')
+
+6. plt.close(): De-allocates visualization graphics memory footprints.
+   plt.close(fig)
+
+--- II. Plot Customization ---
+7. plt.title(): Assigns plot titles.
+   plt.title("Model Training Loss Curve", fontsize=14)
+
+8. plt.xlabel() / plt.ylabel(): Sets text labels for plotting axes.
+   plt.xlabel("Training Epochs")
+
+9. plt.xlim() / plt.ylim(): Restricts display value viewport boundaries.
+   plt.xlim(0, 100)
+
+10. plt.xticks() / plt.yticks(): Configures tick label rotations and position gaps.
+    plt.xticks(ticks=[0, 20, 40, 60, 80, 100], labels=['Start', '20%', '40%', '60%', '80%', 'End'], rotation=45)
+
+11. plt.legend(): Renders trace labels mapping information.
+    plt.legend(loc="upper right")
+
+12. plt.grid(): Renders alignment gridlines behind traces.
+    plt.grid(True, linestyle='--', alpha=0.6)
+
+13. plt.axhline(): Renders reference threshold benchmarks along the horizontal axis.
+    plt.axhline(y=0.5, color='r', linestyle=':')
+
+14. plt.axvline(): Renders reference threshold benchmarks along the vertical axis.
+    plt.axvline(x=best_epoch, color='g', linestyle='--')
+
+15. plt.text(): Draws custom text labels directly onto graph coordinates.
+    plt.text(x=10, y=0.8, s="Early Stopping Trigger")
+
+16. plt.annotate(): Draws pointer arrows connecting callout text to points.
+    plt.annotate("Outlier", xy=(5, 120), xytext=(6, 130), arrowprops=dict(facecolor='black', shrink=0.05))
+
+17. plt.style.use(): Changes the global styling template.
+    plt.style.use('ggplot')
+
+18. plt.gca(): Fetches active plotting axes references.
+    ax = plt.gca()
+
+19. plt.gcf(): Fetches active figure container dimensions.
+    fig = plt.gcf()
+
+--- III. Core Geometry ---
+20. plt.plot(): Renders line graphs (e.g., loss curves, sequences).
+    plt.plot(epochs, loss, label="Loss Vector", color="blue", linewidth=2)
+
+21. plt.scatter(): Generates scatter plots for clustering or distribution analysis.
+    plt.scatter(X[:, 0], X[:, 1], c=labels, cmap='viridis', alpha=0.5)
+
+22. plt.bar(): Renders vertical bar charts for feature importance.
+    plt.bar(feature_names, importance_scores, color='green')
+
+23. plt.barh(): Renders horizontal bar charts (optimal for high-cardinality text).
+    plt.barh(long_names, metrics_scores)
+
+24. plt.hist(): Renders target skewness histograms.
+    plt.hist(residuals, bins=50, edgecolor='black')
+
+25. plt.boxplot(): Renders standard box-and-whisker distribution outliers.
+    plt.boxplot(feature_values)
+
+26. plt.violinplot(): Renders violin distributions tracking structural data variance density.
+    plt.violinplot(dataset_features)
+
+27. plt.pie(): Renders pie charts for composition analysis.
+    plt.pie(class_sizes, labels=class_names, autopct='%1.1f%%')
+
+28. plt.errorbar(): Renders data traces along with error bars.
+    plt.errorbar(x, y, yerr=y_errors, fmt='o')
+
+--- IV. Advanced Matrix & Image Rendering ---
+29. plt.imshow(): Visualizes images or structural matrix configurations.
+    plt.imshow(confusion_matrix, cmap='Blues')
+
+30. plt.colorbar(): Renders a color-scale reference bar beside a heat matrix.
+    plt.colorbar()
+
+31. plt.contourf(): Renders filled contour maps for decision boundary spaces.
+    plt.contourf(XX, YY, ZZ, alpha=0.3)
+
+32. plt.contour(): Renders geometric isolation lines without filling color fills.
+    plt.contour(XX, YY, ZZ, levels=[0.5], colors='black')
+
+33. plt.pcolormesh(): Renders raw dynamic 2D grid spaces rapidly.
+    plt.pcolormesh(X_grid, Y_grid, Z_boundary, cmap='coolwarm')
+
+34. plt.hexbin(): Hexagonal binning plot for dense scatter data points.
+    plt.hexbin(x, y, gridsize=30, cmap='inferno')
+
+35. plt.stem(): Plots discrete sequence data as stems.
+    plt.stem(coefficients)
+
+--- V. Sub-Element Layout Adjustments ---
+36. plt.tight_layout(): Fixes cramped sub-plot overlapping boundaries.
+    plt.tight_layout()
+
+37. fig.suptitle(): Sets a global title across a multi-panel figure.
+    fig.suptitle("Model Evaluation Summary Metrics")
+
+38. ax.set_yscale(): Switches value scale ranges (e.g., log scaling).
+    ax.set_yscale('log')
+
+39. ax.twinx(): Dupliciates an X-axis to overlay two different Y-axis metric scales.
+    ax2 = ax.twinx()
+
+40. ax.set_aspect(): Forces aspect ratio scaling controls (e.g., 'equal').
+    ax.set_aspect('equal')
+
+--- VI. Advanced Structural Elements ---
+41. plt.fill_between(): Fills color between traces (useful for confidence intervals).
+    plt.fill_between(x, y_lower, y_upper, alpha=0.2, color='gray')
+
+42. plt.spy(): Visualizes sparsity patterns in large feature matrices.
+    plt.spy(sparse_matrix, markersize=1)
+
+43. plt.step(): Plots step-wise changes (useful for precision-recall curves).
+    plt.step(recall, precision, where='post')
+
+44. plt.stackplot(): Plots stacked area tracks to monitor structural volume shifts.
+    plt.stackplot(time, class1_share, class2_share)
+
+45. plt.clabel(): Renders text labels directly onto contour lines.
+    plt.clabel(contour_lines, inline=True, fontsize=8)
+
+--- VII. Object-Oriented Interface Anchors ---
+46. ax.set_title(): Object-oriented axis alternative for plotting titles.
+    axes[0, 0].set_title("ROC Curve Analysis")
+
+47. ax.set_xlabel() / ax.set_ylabel(): Object-oriented axis alternative for labels.
+    axes[0, 0].set_xlabel("False Positive Rate")
+
+48. ax.legend(): Object-oriented axis method to render trace maps.
+    axes[0, 0].legend()
+
+49. ax.grid(): Object-oriented axis method to render gridlines.
+    axes[0, 0].grid(True)
+
+50. ax.axhspan(): Fills a horizontal highlights strip across target ranges.
+    ax.axhspan(ymin=0.8, ymax=1.0, facecolor='green', alpha=0.1)
+
+
+================================================================================
+                                 PART 5: SEABORN
+================================================================================
+
+
+--- I. Environment Configuration ---
+1. sns.set_theme(): Sets up systemic dark/light drawing defaults.
+   sns.set_theme(style="whitegrid", palette="muted")
+
+2. sns.despine(): Removes structural chart borders (top and right spines).
+   sns.despine(left=False, bottom=False)
+
+3. sns.set_context(): Sets up scaling defaults for poster/talk presentations.
+   sns.set_context("talk")
+
+4. sns.set_palette(): Changes the active color mapping system.
+   sns.set_palette("colorblind")
+
+--- II. Relational Plots ---
+5. sns.scatterplot(): Draws scatter plots with automatic semantic mapping.
+   sns.scatterplot(data=df, x="feature_1", y="feature_2", hue="target_class")
+
+6. sns.lineplot(): Draws line plots with built-in boot-strapped confidence bands.
+   sns.lineplot(data=df, x="epoch", y="loss", hue="model_variant")
+
+7. sns.relplot(): Figure-level interface for creating multi-panel relational grids.
+   sns.relplot(data=df, x="x", y="y", col="category", kind="scatter")
+
+--- III. Categorical Distributions ---
+8. sns.barplot(): Plots mean aggregate bars along with error indicators.
+   sns.barplot(data=df, x="device_type", y="conversion_rate")
+
+9. sns.countplot(): Counts item frequencies directly from raw columns.
+   sns.countplot(data=df, x="churn_status", palette="Set2")
+
+10. sns.boxplot(): Renders standard boxplots integrated with Pandas frames.
+    sns.boxplot(data=df, x="target_class", y="feature_value")
+
+11. sns.violinplot(): Combines box plots with kernel density estimation curves.
+    sns.violinplot(data=df, x="class", y="feature", inner="quartile")
+
+12. sns.stripplot(): Draws scatter distributions relative to categorical groupings.
+    sns.stripplot(data=df, x="group", y="score", jitter=True, alpha=0.5)
+
+13. sns.swarmplot(): Draws non-overlapping scatter distributions for clear density views.
+    sns.swarmplot(data=df, x="group", y="score")
+
+14. sns.boxenplot(): Enhanced boxplot for larger datasets, showing more quantiles.
+    sns.boxenplot(data=df, x="class", y="scale_metric")
+
+15. sns.pointplot(): Tracks categorical average coordinate change trends.
+    sns.pointplot(data=df, x="time_step", y="response", hue="treatment")
+
+16. sns.catplot(): Figure-level interface for multi-panel categorical plots.
+    sns.catplot(data=df, x="tier", y="revenue", col="region", kind="bar")
+
+--- IV. Data Distributions ---
+17. sns.histplot(): Renders histograms along with optional KDE fit lines.
+    sns.histplot(data=df, x="residuals", kde=True, bins=30)
+
+18. sns.kdeplot(): Renders smooth continuous kernel density estimate probability curves.
+    sns.kdeplot(data=df, x="age", hue="churn", fill=True, common_norm=False)
+
+19. sns.ecdfplot(): Draws empirical cumulative distribution functions.
+    sns.ecdfplot(data=df, x="error_magnitude")
+
+20. sns.rugplot(): Draws marginal tick marks along axes to show point density.
+    sns.rugplot(data=df, x="critical_feature")
+
+21. sns.displot(): Figure-level interface for multi-panel distribution plots.
+    sns.displot(data=df, x="metric", col="fold", kind="hist")
+
+--- V. Structural Layout Matrices & Heatmaps ---
+22. sns.heatmap(): Visualizes confusion matrices and feature correlations[cite: 20, 73].
+    sns.heatmap(df.corr(), annot=True, cmap="coolwarm", fmt=".2f")
+
+23. sns.clustermap(): Performs hierarchical clustering to group matrix trees together.
+    sns.clustermap(df.corr(), cmap="mako", metric="euclidean")
+
+--- VI. Multi-Plot Faceting Grids ---
+24. sns.pairplot(): Renders pairwise scatter grids across all numeric variables.
+    sns.pairplot(df, hue="target_class", corner=True)
+
+25. sns.jointplot(): Combines bivariate relationship views with univariate marginal tracks.
+    sns.jointplot(data=df, x="feature_x", y="feature_y", kind="hex")
+
+26. sns.FacetGrid(): Low-level class initialized to draw customized subplot grids.
+    g = sns.FacetGrid(df, col="region", row="tier")
+    g.map(sns.scatterplot, "age", "income")
+
+27. sns.PairGrid(): Low-level class for highly customized pairwise relationship matrices.
+    g = sns.PairGrid(df, hue="target")
+    g.map_upper(sns.scatterplot)
+    g.map_lower(sns.kdeplot)
+    g.map_diag(sns.histplot)
+
+28. sns.JointGrid(): Low-level class for highly customized joint distribution sub-plots.
+    g = sns.JointGrid(data=df, x="x", y="y")
+    g.plot(sns.scatterplot, sns.histplot)
+
+--- VII. Regression Plots ---
+29. sns.lmplot(): Figure-level interface for fitting linear regression trend lines.
+    sns.lmplot(data=df, x="feature", y="target", col="cohort")
+
+30. sns.regplot(): Binds data traces and fits a linear regression trend line.
+    sns.regplot(data=df, x="age", y="blood_pressure", scatter_kws={'alpha':0.3})
+
+31. sns.residplot(): Plots regression residuals (checks for heteroscedasticity).
+    sns.residplot(data=df, x="predictions", y="residuals", lowess=True)
+
+--- VIII. Theme Configurations & Styling ---
+32. sns.axes_style(): Locally isolates plot background profile styling parameters.
+    with sns.axes_style("dark"):
+        sns.lineplot(data=df, x="x", y="y")
+
+33. sns.get_dataset_names(): Lists bundled sample datasets available for offline training.
+    print(sns.get_dataset_names())
+
+34. sns.load_dataset(): Loads sample datasets (e.g., 'iris', 'titanic', 'penguins').
+    tips = sns.load_dataset("tips")
+
+35. sns.move_legend(): Safely repositions legend overlays without text clipping.
+    sns.move_legend(ax, "lower left", bbox_to_anchor=(1, 1))
+
+--- IX. Color Customization Utilities ---
+36. sns.color_palette(): Returns a list of colors defining a color scheme.
+    current_palette = sns.color_palette("light:#5A9", as_cmap=False)
+
+37. sns.diverging_palette(): Creates a custom two-color diverging palette.
+    cmap = sns.diverging_palette(220, 20, as_cmap=True)
+
+38. sns.light_palette() / sns.dark_palette(): Creates sequential single-color palettes.
+    cmap = sns.light_palette("seagreen", as_cmap=True)
+
+--- X. Axis-Level Matrix Properties ---
+39. ax.collections: Property used to adjust heatmap alpha transparencies.
+    ax.collections[0].set_alpha(0.8)
+
+40. ax.get_lines(): Property used to extract raw trace arrays generated by Seaborn.
+    line_data = ax.get_lines()[0].get_data()
+
+--- XI. Specific Domain Explorations ---
+41. sns.rugplot(height=...): Enhances data dense tick visibility boundaries.
+    sns.rugplot(data=df, x="val", height=0.1)
+
+42. sns.kdeplot(cumulative=True): Draws cumulative distribution function approximations.
+    sns.kdeplot(data=df, x="score", cumulative=True)
+
+43. sns.histplot(multiple="stack"): Visualizes overlapping categorical components.
+    sns.histplot(data=df, x="age", hue="group", multiple="stack")
+
+44. sns.histplot(element="step"): Minimizes visual fill noise in overlapping histograms.
+    sns.histplot(data=df, x="age", hue="group", element="step", fill=False)
+
+45. sns.barplot(estimator=np.median): Changes the aggregation metric from mean to median.
+    sns.barplot(data=df, x="group", y="income", estimator=np.median)
+
+46. sns.violinplot(split=True): Splits a violin plot to compare two categories side-by-side.
+    sns.violinplot(data=df, x="day", y="total_bill", hue="sex", split=True)
+
+47. sns.pairplot(diag_kind="kde"): Forces smooth continuous distribution fits on cross diagonals.
+    sns.pairplot(df, diag_kind="kde")
+
+48. sns.heatmap(linewidths=...): Adds separation grid lines between matrix cells.
+    sns.heatmap(df.corr(), linewidths=0.5, linecolor="gray")
+
+49. sns.heatmap(cbar=False): Turns off the default color bar overlay indicator.
+    sns.heatmap(matrix_data, cbar=False)
+
+50. sns.set(): Systemwide deployment modifier shortcut reset engine.
+    sns.set() # Resets all matplotlib plotting variables back to seaborn defaults.
+================================================================================
